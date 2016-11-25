@@ -20,7 +20,7 @@ me = config["me"]
 elevated = config["elevated"]
 room_num = config["room_num"]
 se_color = config["se_color"]
-censors = [(re.compile(censor[0]), censor[1]) for censor in config["censors"]]
+censors = [(compile(censor[0]), censor[1]) for censor in config["censors"]]
 announce_se_commands = config["announce_se_commands"]
 
 room = None
