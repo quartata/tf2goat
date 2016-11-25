@@ -117,7 +117,7 @@ def command_dispatch(cmd, id, client):
 def report_connect(index):
   player_info = playerinfo_from_index(index)
   if not player_info.is_fake_client():
-    room.send_message(player_info.name + " disconnected")
+    room.send_message(player_info.name + " connected")
 
 @OnClientDisconnect
 def report_disconnect(index):
