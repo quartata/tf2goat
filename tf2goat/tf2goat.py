@@ -12,7 +12,7 @@ from messages import SayText2
 from players.helpers import playerinfo_from_index
 from re import compile
 
-config = json.load(open("config.json", "r"))
+config = load(open("config.json", "r"))
 
 email = config["email"]
 password = config["password"]
