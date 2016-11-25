@@ -6,7 +6,7 @@ from engines import server
 from filters.players import PlayerIter
 from html import unescape
 from json import load
-from listeners import OnClientFullyConnect, OnClientDisconnect, OnConVarChanged, OnLevelInit
+from listeners import OnClientActive, OnClientDisconnect, OnConVarChanged, OnLevelInit
 from listeners.tick import GameThread
 from messages import SayText2
 from players.helpers import playerinfo_from_index
@@ -113,7 +113,7 @@ def command_dispatch(cmd, id, client):
 #  tf_message_avg = len(tf_messages)/6
 #  threading.Timer(30, tf_avg_timer).start()
     
-@OnClientFullyConnect
+@OnClientActive
 def report_connect(index):
   player_info = playerinfo_from_index(index)
   if not player_info.is_fake_client():
