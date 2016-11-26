@@ -9,10 +9,11 @@ from json import load
 from listeners import OnClientActive, OnClientDisconnect, OnConVarChanged, OnLevelInit
 from listeners.tick import GameThread
 from messages import SayText2
+from paths import PLUGIN_PATH
 from players.helpers import playerinfo_from_index
 from re import compile
 
-config = load(open("config.json", "r"))
+config = load(open(PLUGIN_PATH + "/tf2goat/config.json", "r"))
 
 email = config["email"]
 password = config["password"]
