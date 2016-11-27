@@ -23,6 +23,8 @@ room_num = config["room_num"]
 se_color = config["se_color"]
 censors = [(compile(censor[0]), censor[1]) for censor in config["censors"]]
 announce_se_commands = config["announce_se_commands"]
+announce_se_command_output = config["announce_se_command_output"]
+ping_on_reply = config["ping_on_reply"]
 
 room = None
 mod_abuse = 0
@@ -54,7 +56,7 @@ def on_se_chat_message(msg, client):
     content = unescape(msg.content)
 
     if content.startswith("!"):
-      command_dispatch(content.split(" ", 1), msg.user.id, client)      
+      command_dispatch(content.split(" ", 1), msg.user, client)      
       if announce_se_commands:
         SayText2("\x07"+ se_color +"[SE] "+ msg.user.name + "\x01: " + content).send()
     else:
@@ -77,39 +79,49 @@ def on_tf_chat_message(msg, index, team_only):
 
   return True
 
-def command_dispatch(cmd, id, client):
+def command_dispatch(cmd, sender, client):
+  id = sender.id
   if cmd[0] == "!status":
-    room.send_message("Name: %s\n Map: %s\n Players: %d/%d (%d bots)\n Tags: %s" % (
+    send_command_response("Name: %s\n Map: %s\n Players: %d/%d (%d bots)\n Tags: %s" % (
       server.server.name,
       server.server.map_name, 
       server.server.num_clients, server.server.max_clients, server.server.num_fake_clients,
       cvar.find_var("sv_tags").get_string() 
-    ))
+    ), sender)
   elif cmd[0] == "!players":
     msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % ({2:'RED', 3:'BLU',}.get(p.team, 'SPEC')), p.name, p.steamid, p.kills, p.deaths) for p in PlayerIter())
-    room.send_message(msg if msg else "No players.")
+    send_command_response(msg if msg else "No players.", sender)
   elif cmd[0] == "!abuse":
-    room.send_message("mod abuse: " + str(mod_abuse) + "/11")
+    send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender)
   elif cmd[0] == "!rcon":
     if id in elevated:
       server.queue_command_string(cmd[1])
     else:
-      room.send_message("You do not have permission to do that.")
+      send_command_response("You do not have permission to do that.", sender)
   elif cmd[0] == "!rm":
     if id in elevated:
       msg = client.get_message(int(cmd[1]))
       msg.delete()
     else:
-      room.send_message("You do not have permission to do that.")
+      send_command_response("You do not have permission to do that.", sender)
   elif cmd[0] == "!trash":
     if id in elevated:
       msg = client.get_message(int(cmd[1]))
       msg.move("19718")
     else:
-      room.send_message("You do not have permission to do that.")
+      send_command_response("You do not have permission to do that.", sender)
   else:
-    room.send_message("No such command.")
+    send_command_response("No such command.", sender)
 
+def send_command_response(message, sender):
+  if ping_on_reply:
+    # TODO: Reply to a specific message using ":<message id>"
+    message = "@" + sender.name + "\n" + message
+  if announce_se_command_output:
+    # Not sure how messy this will be for multi-line output
+    SayText2("\x07"+ se_color +"[SE] TF2Goat\x01: "+ message).send()
+  room.send_message(message)
+  
 #def tf_avg_timer():
 #  tf_message_avg = len(tf_messages)/6
 #  threading.Timer(30, tf_avg_timer).start()
