@@ -12,6 +12,7 @@ from messages import SayText2
 from paths import PLUGIN_PATH
 from players.helpers import playerinfo_from_index
 from re import compile
+from steam import SteamID
 
 config = load(open(PLUGIN_PATH + "/tf2goat/config.json", "r"))
 
@@ -64,14 +65,14 @@ def on_se_chat_message(msg, client):
 
 @SayFilter
 def on_tf_chat_message(msg, index, team_only):
-  content = msg.command_string
-
-  for pattern, censor in censors:
-    content = pattern.sub(censor, content)
-  
-  #tf_messages.append(msg.command_string)
-  player_info = playerinfo_from_index(index)
   if index and not team_only:
+    content = msg.command_string
+
+    for pattern, censor in censors:
+      content = pattern.sub(censor, content)
+  
+    #tf_messages.append(msg.command_string)
+    player_info = playerinfo_from_index(index)
     if player_info.is_dead():
       room.send_message("**[TF2] \*DEAD\* " + player_info.name + "**: " + content)
     else:
@@ -91,7 +92,7 @@ def command_dispatch(cmd, sender, client):
   elif cmd[0] == "!players":
     msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
-      p.name, p.steamid, 
+      p.name, SteamID.parse(p.steamid).to_uint64(), 
       p.kills, p.deaths
     ) for p in PlayerIter())
     
