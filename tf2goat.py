@@ -1,5 +1,5 @@
-from chatexchange6.client import Client
-from chatexchange6.events import MessagePosted
+from chatexchange.client import Client
+from chatexchange.events import MessagePosted
 from commands.say import SayFilter
 from cvars import cvar
 from engines import server
