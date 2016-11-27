@@ -89,7 +89,12 @@ def command_dispatch(cmd, sender, client):
       cvar.find_var("sv_tags").get_string() 
     ), sender)
   elif cmd[0] == "!players":
-    msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % ({2:'RED', 3:'BLU',}.get(p.team, 'SPEC')), p.name, p.steamid, p.kills, p.deaths) for p in PlayerIter())
+    msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+      "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
+      p.name, p.steamid, 
+      p.kills, p.deaths
+    ) for p in PlayerIter())
+    
     send_command_response(msg if msg else "No players.", sender)
   elif cmd[0] == "!abuse":
     send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender)
