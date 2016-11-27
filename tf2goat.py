@@ -86,7 +86,7 @@ def command_dispatch(cmd, id, client):
       cvar.find_var("sv_tags").get_string() 
     ))
   elif cmd[0] == "!players":
-    msg = "\n".join("%s: %s" % (p.name, p.kills) for p in PlayerIter())
+    msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % ({2:'RED', 3:'BLU',}.get(p.team, 'SPEC')), p.name, p.steamid, p.kills, p.deaths) for p in PlayerIter())
     room.send_message(msg if msg else "No players.")
   elif cmd[0] == "!abuse":
     room.send_message("mod abuse: " + str(mod_abuse) + "/11")
