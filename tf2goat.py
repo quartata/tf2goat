@@ -58,9 +58,9 @@ def on_se_chat_message(msg, client):
     if content.startswith("!"):
       command_dispatch(content.split(" ", 1), msg.user, client)      
       if announce_se_commands:
-        SayText2("\x07"+ se_color +"[SE] "+ msg.user.name + "\x01: " + content).send()
+        SayText2("\x07" + se_color + "[SE] " + msg.user.name + "\x01: " + content).send()
     else:
-      SayText2("\x07"+ se_color +"[SE] "+ msg.user.name + "\x01: " + content).send()
+      SayText2("\x07" + se_color + "[SE] " + msg.user.name + "\x01: " + content).send()
 
 @SayFilter
 def on_tf_chat_message(msg, index, team_only):
@@ -121,10 +121,10 @@ def command_dispatch(cmd, sender, client):
 def send_command_response(message, sender):
   if ping_on_reply:
     # TODO: Reply to a specific message using ":<message id>"
-    message = "@" + sender.name + "\n" + message
+    message = "@" + sender.name + " " + message
   if announce_se_command_output:
     # Not sure how messy this will be for multi-line output
-    SayText2("\x07"+ se_color +"[SE] TF2Goat\x01: "+ message).send()
+    SayText2("\x07" + se_color + "[SE] TF2Goat\x01: "+ message).send()
   room.send_message(message)
   
 #def tf_avg_timer():
