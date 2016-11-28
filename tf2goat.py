@@ -14,7 +14,9 @@ from players.helpers import playerinfo_from_index
 from re import compile
 from steam import SteamID
 
-config = load(open(PLUGIN_PATH + "/tf2goat/config.json", "r"))
+file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
+config = load(file)
+file.close()
 
 email = config["email"]
 password = config["password"]
