@@ -90,7 +90,7 @@ def on_tf_chat_message(msg, index, team_only):
 
 @TypedServerCommand("goat_cmd")
 def console_command(_, command):
-  command_dispath(command.split(" ", 1), None)
+  command_dispatch(command.split(" ", 1), None)
 
 def command_dispatch(cmd, sender):
   id = sender.id if sender else 0
