@@ -90,7 +90,7 @@ def command_dispatch(cmd, sender, client):
       server.server.map_name, 
       server.server.num_clients, server.server.max_clients, server.server.num_fake_clients,
       cvar.find_var("sv_tags").get_string() 
-    ), sender)
+    ), sender, True)
   elif cmd[0] == "!players":
     msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
@@ -98,33 +98,36 @@ def command_dispatch(cmd, sender, client):
       p.kills, p.deaths
     ) for p in PlayerIter())
     
-    send_command_response(msg if msg else "No players.", sender)
+    send_command_response(msg if msg else "No players.", sender, True)
   elif cmd[0] == "!abuse":
-    send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender)
+    send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender, False)
   elif cmd[0] == "!rcon":
     if id in elevated:
       server.queue_command_string(cmd[1])
     else:
-      send_command_response("You do not have permission to do that.", sender)
+      send_command_response("You do not have permission to do that.", sender, False)
   elif cmd[0] == "!rm":
     if id in elevated:
       msg = client.get_message(int(cmd[1]))
       msg.delete()
     else:
-      send_command_response("You do not have permission to do that.", sender)
+      send_command_response("You do not have permission to do that.", sender, False)
   elif cmd[0] == "!trash":
     if id in elevated:
       msg = client.get_message(int(cmd[1]))
       msg.move("19718")
     else:
-      send_command_response("You do not have permission to do that.", sender)
+      send_command_response("You do not have permission to do that.", sender, False)
   else:
-    send_command_response("No such command.", sender)
+    send_command_response("No such command.", sender, False)
 
-def send_command_response(message, sender):
+def send_command_response(message, sender, multiline):
   if ping_on_reply:
     # TODO: Reply to a specific message using ":<message id>"
-    message = "@" + sender.name + " " + message
+    if multiline:
+      message = message + "\n@" + sender.name
+    else:
+      message = "@" + sender.name + " " + message
   if announce_se_command_output:
     # Not sure how messy this will be for multi-line output
     SayText2("\x07" + se_color + "[SE] TF2Goat\x01: "+ message).send()
