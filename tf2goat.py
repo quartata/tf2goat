@@ -85,14 +85,15 @@ def on_tf_chat_message(msg, index, team_only):
 def command_dispatch(cmd, sender, client):
   id = sender.id
   if cmd[0] == "!status":
-    send_command_response("Name: %s\n Map: %s\n Players: %d/%d (%d bots)\n Tags: %s" % (
+    send_command_response("Name: %s\nMap: %s\nPlayers: %d/%d (%d bots)\nTags: %s" % (
       server.server.name,
       server.server.map_name, 
       server.server.num_clients, server.server.max_clients, server.server.num_fake_clients,
       cvar.find_var("sv_tags").get_string() 
     ), sender)
   elif cmd[0] == "!players":
-    msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+    msg = "\n".join("%s%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+      "**DEAD** " if playerinfo_from_index(p.userid).is_dead(),
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
       p.name, SteamID.parse(p.steamid).to_uint64(), 
       p.kills, p.deaths
@@ -100,7 +101,7 @@ def command_dispatch(cmd, sender, client):
     
     send_command_response(msg if msg else "No players.", sender)
   elif cmd[0] == "!abuse":
-    send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender)
+    send_command_response("Admin abuse: " + str(mod_abuse) + "/11", sender)
   elif cmd[0] == "!rcon":
     if id in elevated:
       server.queue_command_string(cmd[1])
