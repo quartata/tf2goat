@@ -1,6 +1,9 @@
 from chatexchange.client import Client
 from chatexchange.events import MessagePosted
 from commands.say import SayFilter
+from commands.typed import TypedServerCommand
+from core import echo_console
+from core.command import _core_command
 from cvars import cvar
 from engines import server
 from filters.players import PlayerIter
@@ -13,6 +16,7 @@ from paths import PLUGIN_PATH
 from players.helpers import playerinfo_from_index
 from re import compile
 from steam import SteamID
+from subprocess import run
 
 file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
 config = load(file)
@@ -21,15 +25,17 @@ file.close()
 email = config["email"]
 password = config["password"]
 me = config["me"]
-elevated = config["elevated"]
+elevated = [0] + config["elevated"]
 room_num = config["room_num"]
 se_color = config["se_color"]
 censors = [(compile(censor[0]), censor[1]) for censor in config["censors"]]
 announce_se_commands = config["announce_se_commands"]
 announce_se_command_output = config["announce_se_command_output"]
 ping_on_reply = config["ping_on_reply"]
+branch = config["branch"]
 
 room = None
+client = None
 mod_abuse = 0
 
 # 5-second rolling average used to determine whether we need to put multiple TF messages in one SE
@@ -38,7 +44,7 @@ mod_abuse = 0
 #tf_messages = []
 
 def load():
-  global room
+  global client, room
   
   client = Client("stackexchange.com")
   client.login(email, password)
@@ -54,12 +60,12 @@ def load():
 def unload():
   room.leave()
 
-def on_se_chat_message(msg, client):
+def on_se_chat_message(msg, _):
   if isinstance(msg, MessagePosted) and msg.user.id != me:
     content = unescape(msg.content)
 
     if content.startswith("!"):
-      command_dispatch(content.split(" ", 1), msg.user, client)      
+      command_dispatch(content.split(" ", 1), msg.user)      
       if announce_se_commands:
         SayText2("\x07" + se_color + "[SE] " + msg.user.name + "\x01: " + content).send()
     else:
@@ -82,8 +88,13 @@ def on_tf_chat_message(msg, index, team_only):
 
   return True
 
-def command_dispatch(cmd, sender, client):
-  id = sender.id
+@TypedServerCommand("goat_cmd")
+def console_command(_, command):
+  command_dispath(command, None)
+
+def command_dispatch(cmd, sender):
+  id = sender.id if sender else 0
+  
   if cmd[0] == "!status":
     send_command_response("Name: %s\n Map: %s\n Players: %d/%d (%d bots)\n Tags: %s" % (
       server.server.name,
@@ -118,21 +129,35 @@ def command_dispatch(cmd, sender, client):
       msg.move("19718")
     else:
       send_command_response("You do not have permission to do that.", sender, False)
+  elif cmd[0] == "!pull":
+    if id in elevated:
+      result = run(["git", "-C", PLUGIN_PATH + "/tf2goat/", "pull", "origin", branch])
+      
+      if result.returncode == 0:
+        send_command_response("Pulled; restarting...", sender, False)
+        _core_command.reload_plugin("tf2goat")
+      else:
+        send_command_response("Pull failed. Return code: %d" % result.returncode, sender, False)
+    else:
+      send_command_response("You do not have permission to do that.", sender, False)
   else:
     send_command_response("No such command.", sender, False)
 
 def send_command_response(message, sender, multiline):
-  if ping_on_reply:
-    # TODO: Reply to a specific message using ":<message id>"
-    if multiline:
-      message = message + "\n@" + sender.name
-    else:
-      message = "@" + sender.name + " " + message
-  if announce_se_command_output:
-    # Not sure how messy this will be for multi-line output
-    SayText2("\x07" + se_color + "[SE] TF2Goat\x01: "+ message).send()
-  room.send_message(message)
-  
+  if sender:
+    if ping_on_reply:
+      # TODO: Reply to a specific message using ":<message id>"
+      if multiline:
+        message = message + "\n@" + sender.name
+      else:
+        message = "@" + sender.name + " " + message
+    if announce_se_command_output:
+      # Not sure how messy this will be for multi-line output
+      SayText2("\x07" + se_color + "[SE] TF2Goat\x01: "+ message).send()
+    room.send_message(message)
+  else:
+    echo_console(message)
+
 #def tf_avg_timer():
 #  tf_message_avg = len(tf_messages)/6
 #  threading.Timer(30, tf_avg_timer).start()
