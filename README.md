@@ -13,6 +13,6 @@ A bidirectional SE <-> Source (not just TF2) chat relay. Requires the latest ver
 | censors                    	| An array of arrays of the form [pattern, substitution] -- the chat relay will perform these substitutions on messages going from TF2 to SE.                                   	|
 | announce_se_commands       	| Whether the chat relay should print SE messages beginning with "!" to TF2 chat. (1 is True, 0 is False)                                                    	|
 | announce_se_command_output 	| Whether the chat relay should print command output to TF2 as well as SE. (1 is True, 0 is False)                                                           	|
-| ping_on_reply              	| Whether the chat relay should precede command output messages with "@<name>" so that the user who sent the command is pinged.                                    	|
+| ping_on_reply              	| Whether the chat relay should precede command output messages with "@\<name\>" so that the user who sent the command is pinged.                                    	|
 
 Thanks to [printf](http://github.com/scoliono) and [Downgoat](http://github.com/vihanb) for help on various things.
