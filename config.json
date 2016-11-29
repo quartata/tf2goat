@@ -8,5 +8,6 @@
   "announce_se_commands": 1,
   "announce_se_command_output": 1,
   "ping_on_reply": 1,
-  "censors": []
+  "censors": [],
+  "branch": "master"
 }
