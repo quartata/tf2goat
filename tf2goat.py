@@ -12,8 +12,11 @@ from messages import SayText2
 from paths import PLUGIN_PATH
 from players.helpers import playerinfo_from_index
 from re import compile
+from steam import SteamID
 
-config = load(open(PLUGIN_PATH + "/tf2goat/config.json", "r"))
+file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
+config = load(file)
+file.close()
 
 email = config["email"]
 password = config["password"]
@@ -58,20 +61,20 @@ def on_se_chat_message(msg, client):
     if content.startswith("!"):
       command_dispatch(content.split(" ", 1), msg.user, client)      
       if announce_se_commands:
-        SayText2("\x07"+ se_color +"[SE] "+ msg.user.name + "\x01: " + content).send()
+        SayText2("\x07" + se_color + "[SE] " + msg.user.name + "\x01: " + content).send()
     else:
-      SayText2("\x07"+ se_color +"[SE] "+ msg.user.name + "\x01: " + content).send()
+      SayText2("\x07" + se_color + "[SE] " + msg.user.name + "\x01: " + content).send()
 
 @SayFilter
 def on_tf_chat_message(msg, index, team_only):
-  content = msg.command_string
-
-  for pattern, censor in censors:
-    content = pattern.sub(censor, content)
-  
-  #tf_messages.append(msg.command_string)
-  player_info = playerinfo_from_index(index)
   if index and not team_only:
+    content = msg.command_string
+
+    for pattern, censor in censors:
+      content = pattern.sub(censor, content)
+  
+    #tf_messages.append(msg.command_string)
+    player_info = playerinfo_from_index(index)
     if player_info.is_dead():
       room.send_message("**[TF2] \*DEAD\* " + player_info.name + "**: " + content)
     else:
@@ -91,7 +94,7 @@ def command_dispatch(cmd, sender, client):
   elif cmd[0] == "!players":
     msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
-      p.name, p.steamid, 
+      p.name, SteamID.parse(p.steamid).to_uint64(), 
       p.kills, p.deaths
     ) for p in PlayerIter())
     
@@ -121,10 +124,10 @@ def command_dispatch(cmd, sender, client):
 def send_command_response(message, sender):
   if ping_on_reply:
     # TODO: Reply to a specific message using ":<message id>"
-    message = "@" + sender.name + "\n" + message
+    message = "@" + sender.name + " " + message
   if announce_se_command_output:
     # Not sure how messy this will be for multi-line output
-    SayText2("\x07"+ se_color +"[SE] TF2Goat\x01: "+ message).send()
+    SayText2("\x07" + se_color + "[SE] TF2Goat\x01: "+ message).send()
   room.send_message(message)
   
 #def tf_avg_timer():
