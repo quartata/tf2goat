@@ -58,8 +58,8 @@ def load():
   GameThread(target=f).start()
 
 def unload():
-  room.leave()
   client._request_queue.queue.clear()
+  room.leave()
   client.logout()
 
 def on_se_chat_message(msg, _):
@@ -107,7 +107,7 @@ def command_dispatch(cmd, sender):
   elif cmd[0] == "!players":
     msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
-      p.name, SteamID.parse(p.steamid).to_uint64(), 
+      p.name, SteamID.parse(p.steamid if p.steamid != "BOT" else "[U:1:169802]").to_uint64(), 
       p.kills, p.deaths
     ) for p in PlayerIter())
     
