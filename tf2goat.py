@@ -59,6 +59,8 @@ def load():
 
 def unload():
   room.leave()
+  client._request_queue.queue.clear()
+  client.logout()
 
 def on_se_chat_message(msg, _):
   if isinstance(msg, MessagePosted) and msg.user.id != me:
