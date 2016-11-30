@@ -105,7 +105,7 @@ def command_dispatch(cmd, sender):
       cvar.find_var("sv_tags").get_string() 
     ), sender, True)
   elif cmd[0] == "!players":
-    msg = "\n".join("%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+    msg = "\n".join("%s - %s (http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
       p.name, SteamID.parse(p.steamid if p.steamid != "BOT" else "[U:1:169802]").to_uint64(), 
       p.kills, p.deaths
@@ -136,7 +136,8 @@ def command_dispatch(cmd, sender):
       result = run(["git", "-C", PLUGIN_PATH + "/tf2goat/", "pull", "origin", branch])
       
       if result.returncode == 0:
-        send_command_response("Pulled; restarting...", sender, False)
+        send_command_response("Pulled; restarting in 5 seconds...", sender, False)
+        sleep(5)
         _core_command.reload_plugin("tf2goat")
       else:
         send_command_response("Pull failed. Return code: %d" % result.returncode, sender, False)
