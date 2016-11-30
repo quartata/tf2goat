@@ -17,6 +17,7 @@ from players.helpers import playerinfo_from_index
 from re import compile
 from steam import SteamID
 from subprocess import run
+from time import sleep
 
 file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
 config = load(file)
