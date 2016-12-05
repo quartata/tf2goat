@@ -18,6 +18,7 @@ from re import compile
 from steam import SteamID
 from subprocess import run
 from time import sleep
+from events import Event
 
 file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
 config = load(file)
@@ -106,8 +107,8 @@ def command_dispatch(cmd, sender):
       cvar.find_var("sv_tags").get_string() 
     ), sender, True)
   elif cmd[0] == "!players":
-    msg = "\n".join("%s%s - [%s](http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
-      "**DEAD** " if playerinfo_from_index(p.userid).is_dead(),
+    msg = "\n".join("%s%s - **%s** (http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+      "\*DEAD\* " if playerinfo_from_index(p.userid).is_dead(),
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
       p.name, SteamID.parse(p.steamid if p.steamid != "BOT" else "[U:1:22202]").to_uint64(), 
       p.kills, p.deaths
@@ -115,7 +116,7 @@ def command_dispatch(cmd, sender):
     
     send_command_response(msg if msg else "No players.", sender, True)
   elif cmd[0] == "!abuse":
-    send_command_response("mod abuse: " + str(mod_abuse) + "/11", sender, False)
+    send_command_response("Admin abuse: " + str(mod_abuse) + "/11", sender, False)
   elif cmd[0] == "!rcon":
     if id in elevated:
       server.queue_command_string(cmd[1])
@@ -192,4 +193,8 @@ def on_mod_abuse(cvar, value):
 
   if cvar.default == value and cvar.flags & 256:
     mod_abuse += 1
+
+@Event("player_changename")
+def on_player_change_name(event):
+  room.send_message("\* Player %s changed name to %s" % event["oldname"], event["newname"])
 
