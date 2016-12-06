@@ -6,6 +6,7 @@ from core import echo_console
 from core.command import _core_command
 from cvars import cvar
 from engines import server
+from events import Event
 from filters.players import PlayerIter
 from html import unescape
 from json import load
@@ -18,7 +19,6 @@ from re import compile
 from steam import SteamID
 from subprocess import run
 from time import sleep
-from events import Event
 
 file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
 config = load(file)
@@ -108,7 +108,7 @@ def command_dispatch(cmd, sender):
     ), sender, True)
   elif cmd[0] == "!players":
     msg = "\n".join("%s%s - **%s** (http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
-      "\*DEAD\* " if playerinfo_from_index(p.userid).is_dead(),
+      "\*DEAD\* " if p.playerinfo.is_dead(),
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
       p.name, SteamID.parse(p.steamid if p.steamid != "BOT" else "[U:1:22202]").to_uint64(), 
       p.kills, p.deaths
@@ -197,4 +197,3 @@ def on_mod_abuse(cvar, value):
 @Event("player_changename")
 def on_player_change_name(event):
   room.send_message("\* Player %s changed name to %s" % event["oldname"], event["newname"])
-
