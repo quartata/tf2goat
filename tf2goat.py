@@ -136,7 +136,7 @@ def command_dispatch(cmd, sender):
       send_command_response("You do not have permission to do that.", sender, False)
   elif cmd[0] == "!pull":
     if id in elevated:
-      result = run(["git", "-C", PLUGIN_PATH + "/tf2goat/", "pull", "origin", branch])
+      result = run(["git", "-C", PLUGIN_PATH + "/tf2goat/", "pull", "origin", branch, "-X", "theirs", "--no-edit"])
       
       if result.returncode == 0:
         send_command_response("Pulled; restarting in 5 seconds...", sender, False)
