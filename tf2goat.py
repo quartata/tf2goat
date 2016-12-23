@@ -13,12 +13,13 @@ from json import load
 from listeners import OnClientActive, OnClientDisconnect, OnConVarChanged, OnLevelInit
 from listeners.tick import GameThread
 from messages import SayText2
-from paths import PLUGIN_PATH
+from paths import GAME_PATH, PLUGIN_PATH
 from players.helpers import playerinfo_from_index
 from re import compile
 from steam import SteamID
 from subprocess import run
 from time import sleep
+from urllib.request import urlretrieve
 
 file = open(PLUGIN_PATH + "/tf2goat/config.json", "r")
 config = load(file)
@@ -144,6 +145,17 @@ def command_dispatch(cmd, sender):
         _core_command.reload_plugin("tf2goat")
       else:
         send_command_response("Pull failed. Return code: %d" % result.returncode, sender, False)
+    else:
+      send_command_response("You do not have permission to do that.", sender, False)
+  elif cmd[0] == "!curl":
+    if id in elevated:
+      url, path = cmd[1].split(" ", 1)
+      
+      try:
+        urlretrieve(url, filename=GAME_PATH + path)
+        send_command_response("Curl successful.", sender, False)
+      except:
+        send_command_response("Curl failed.", sender, False)
     else:
       send_command_response("You do not have permission to do that.", sender, False)
   else:
