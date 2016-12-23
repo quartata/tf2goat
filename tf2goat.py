@@ -107,8 +107,8 @@ def command_dispatch(cmd, sender):
       cvar.find_var("sv_tags").get_string() 
     ), sender, True)
   elif cmd[0] == "!players":
-    msg = "\n".join("%s%s - **%s** (http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
-      "\*DEAD\* " if p.playerinfo.is_dead() else "",
+    msg = "\n".join("%s%s - %s (http://steamcommunity.com/profiles/%s): %s kills/%s deaths" % (
+      "*DEAD* " if p.playerinfo.is_dead() else "",
       "RED" if p.team == 2 else "BLU" if p.team == 3 else "SPEC",
       p.name, SteamID.parse(p.steamid if p.steamid != "BOT" else "[U:1:22202]").to_uint64(), 
       p.kills, p.deaths
